@@ -1,5 +1,7 @@
 package async;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -44,16 +46,17 @@ public class AsyncIOExample {
         env.execute("AsyncFunction Demo");
     }
 
+    // todo
     public static class SimpleAsyncFunction extends RichAsyncFunction<String, String>{
 
-        private long waitTime;
-        private final Random rnd = new Random(hashCode());
+        private final Random rnd = new Random();
 
         @Override
         public void asyncInvoke(String input, ResultFuture<String> resultFuture) throws Exception {
+//            Random rnd = new Random();
             // 随机睡眠 1 - 10s
-            System.out.println("开始 AsyncFunction  target -> " + input);
-            waitTime = rnd.nextInt(10);
+            System.out.println(Thread.currentThread().getId() + "\t" + this.hashCode() + "开始 AsyncFunction  target -> " + input);
+            long waitTime = rnd.nextInt(10);
             Thread.sleep(waitTime * 1000);
             String out = input + input;
             resultFuture.complete(Collections.singletonList(out));
